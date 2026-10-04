@@ -32,7 +32,7 @@ ol.steps{margin:8px 0;padding-left:22px;font-size:14.5px;line-height:1.7}
 <main id="ui">
   <div class="kor">태권도 · POOMSAE GUIADO</div>
   <h1>Practica formas en realidad virtual</h1>
-  <p class="sub">Sigue los 18 movimientos de <b>Taegeuk Il Jang</b> junto a un instructor sombra que demuestra cada postura, giro y técnica dentro del visor. Los controles se usan en las manos; el prototipo guía el recorrido y aproxima la posición de brazos y orientación.</p>
+  <p class="sub">Sigue los 18 movimientos de <b>Taegeuk Il Jang</b> junto a un instructor sombra que demuestra cada postura, giro y técnica dentro del visor. Antes de cada técnica verás si debes girar o avanzar y qué pie va al frente. Los controles se usan en las manos; el prototipo guía el recorrido y aproxima la posición de brazos y orientación.</p>
 
   <section class="card"><h2>Tipo de práctica</h2><div class="opts" id="modeOpts">
     <button class="opt sel" type="button" data-v="learn"><b>Aprender</b><span>Espera hasta alcanzar la guía de mano. El gatillo confirma patadas o permite continuar.</span></button>
@@ -51,11 +51,11 @@ ol.steps{margin:8px 0;padding-left:22px;font-size:14.5px;line-height:1.7}
     <button class="opt" type="button" data-v="2.2"><b>Continua · 2.2 s</b></button>
   </div></section>
 
-  <section class="card"><h2>Sesión preparada</h2><div class="session-line"><div><strong>Taegeuk Il Jang</strong><span>18 movimientos · nivel inicial</span></div><span id="sessionSummary">Forma completa · 3 s por movimiento</span></div><div class="move-tags"><span>Ap sogi</span><span>Ap kubi</span><span>Arae makki</span><span>Momtong jireugi</span><span>Momtong an makki</span><span>Olgul makki</span><span>Ap chagi</span></div><div class="coach-note"><span class="coach-dot"></span><span><b>Instructor sombra activo.</b> Se coloca delante de ti y demuestra la técnica en la dirección del movimiento.</span></div></section>
+  <section class="card"><h2>Sesión preparada</h2><div class="session-line"><div><strong>Taegeuk Il Jang</strong><span>18 movimientos · nivel inicial</span></div><span id="sessionSummary">Forma completa · 3 s por movimiento</span></div><div class="move-tags"><span>Ap sogi</span><span>Ap kubi</span><span>Arae makki</span><span>Momtong jireugi</span><span>Momtong an makki</span><span>Olgul makki</span><span>Ap chagi</span></div><div class="coach-note"><span class="coach-dot"></span><span><b>Instructor sombra activo.</b> Antes de cada técnica, una indicación grande marca el giro o avance y el pie que debes llevar al frente.</span></div></section>
 
   <div class="warn"><b>Seguridad primero:</b> despeja un área de al menos 2 × 2 m, activa el límite de seguridad y usa las correas de muñeca. Practica sin golpear objetos; el visor no puede comprobar la colocación exacta de los pies.</div>
 
-  <section class="card"><h2>Cómo se practica en VR</h2><ol class="steps"><li>Gira hacia el <b>instructor sombra</b> y cópialo de frente, como en un espejo.</li><li>Mira la <b>flecha del suelo</b> para confirmar la dirección y lleva la mano indicada al <b>aro luminoso</b>.</li><li>En las patadas, observa la demostración repetida, ejecuta el movimiento con control y pulsa el <b>gatillo</b> al terminar.</li><li>El panel muestra conteo, técnica, postura y el siguiente paso.</li></ol></section>
+  <section class="card"><h2>Cómo se practica en VR</h2><ol class="steps"><li>El primer movimiento empieza con <b>giro a la izquierda y pie izquierdo al frente</b>; no lances el bloqueo antes del giro.</li><li>En cada paso, sigue la indicación <b>Gira / Avanza</b> y el pie que aparece debajo. Después copia al <b>instructor sombra</b> de frente, como en un espejo.</li><li>Mira la <b>flecha del suelo</b> para confirmar la dirección y lleva la mano indicada al <b>aro luminoso</b>.</li><li>En las patadas, observa la demostración repetida, ejecuta el movimiento con control y pulsa el <b>gatillo</b> al terminar.</li></ol></section>
 
   <button id="enterVR" disabled>Comprobando WebXR…</button><div id="xrStatus" role="status" aria-live="polite"></div>
   <section class="card" id="results"><h2>Última pasada</h2><div id="resultsBody"></div></section>
@@ -93,24 +93,24 @@ const banner=new THREE.Mesh(new THREE.PlaneGeometry(4.6,1.15),new THREE.MeshBasi
 }
 
 const MOVES=[
-{n:1,dir:-90,side:'left',kind:'low',tech:'Bloqueo bajo izquierdo',stance:'Ap sogi izquierdo'},
-{n:2,dir:-90,side:'right',kind:'punch',tech:'Puño medio derecho',stance:'Ap sogi derecho'},
-{n:3,dir:90,side:'right',kind:'low',tech:'Bloqueo bajo derecho',stance:'Ap sogi derecho'},
-{n:4,dir:90,side:'left',kind:'punch',tech:'Puño medio izquierdo',stance:'Ap sogi izquierdo'},
-{n:5,dir:0,side:'left',kind:'low',tech:'Bloqueo bajo izquierdo',stance:'Ap kubi izquierdo'},
-{n:6,dir:0,side:'right',kind:'punch',tech:'Puño medio derecho',stance:'Mantén ap kubi'},
-{n:7,dir:90,side:'left',kind:'inside',tech:'Bloqueo medio interior izquierdo',stance:'Ap sogi derecho'},
-{n:8,dir:90,side:'right',kind:'punch',tech:'Puño medio derecho',stance:'Ap sogi izquierdo'},
-{n:9,dir:-90,side:'right',kind:'inside',tech:'Bloqueo medio interior derecho',stance:'Ap sogi izquierdo'},
-{n:10,dir:-90,side:'left',kind:'punch',tech:'Puño medio izquierdo',stance:'Ap sogi derecho'},
-{n:11,dir:0,side:'right',kind:'low',tech:'Bloqueo bajo derecho',stance:'Ap kubi derecho'},
-{n:12,dir:0,side:'left',kind:'punch',tech:'Puño medio izquierdo',stance:'Mantén ap kubi'},
-{n:13,dir:-90,side:'left',kind:'high',tech:'Bloqueo alto izquierdo',stance:'Ap sogi izquierdo'},
-{n:14,dir:-90,side:'right',kind:'kick',tech:'Patada frontal + puño derecho',stance:'Ap sogi derecho'},
-{n:15,dir:90,side:'right',kind:'high',tech:'Bloqueo alto derecho',stance:'Ap sogi derecho'},
-{n:16,dir:90,side:'left',kind:'kick',tech:'Patada frontal + puño izquierdo',stance:'Ap sogi izquierdo'},
-{n:17,dir:180,side:'left',kind:'low',tech:'Bloqueo bajo izquierdo',stance:'Ap kubi izquierdo'},
-{n:18,dir:180,side:'right',kind:'punch',tech:'Puño medio derecho · KIHAP',stance:'Ap kubi derecho'}
+{n:1,dir:-90,side:'left',kind:'low',travel:'GIRA 90° A LA IZQUIERDA',leadSide:'left',lead:'PIE IZQUIERDO AL FRENTE',tech:'Bloqueo bajo izquierdo',stance:'Ap sogi izquierdo'},
+{n:2,dir:-90,side:'right',kind:'punch',travel:'AVANZA',leadSide:'right',lead:'PIE DERECHO AL FRENTE',tech:'Puño medio derecho',stance:'Ap sogi derecho'},
+{n:3,dir:90,side:'right',kind:'low',travel:'GIRA 180° A LA DERECHA',leadSide:'right',lead:'PIE DERECHO AL FRENTE',tech:'Bloqueo bajo derecho',stance:'Ap sogi derecho'},
+{n:4,dir:90,side:'left',kind:'punch',travel:'AVANZA',leadSide:'left',lead:'PIE IZQUIERDO AL FRENTE',tech:'Puño medio izquierdo',stance:'Ap sogi izquierdo'},
+{n:5,dir:0,side:'left',kind:'low',travel:'GIRA 90° A LA IZQUIERDA',leadSide:'left',lead:'PIE IZQUIERDO AL FRENTE',tech:'Bloqueo bajo izquierdo',stance:'Ap kubi izquierdo'},
+{n:6,dir:0,side:'right',kind:'punch',travel:'AVANZA',leadSide:'right',lead:'PIE DERECHO AL FRENTE',tech:'Puño medio derecho',stance:'Ap kubi derecho'},
+{n:7,dir:90,side:'left',kind:'inside',travel:'GIRA 90° A LA DERECHA',leadSide:'right',lead:'PIE DERECHO AL FRENTE',tech:'Bloqueo medio interior izquierdo',stance:'Ap sogi derecho'},
+{n:8,dir:90,side:'right',kind:'punch',travel:'AVANZA',leadSide:'left',lead:'PIE IZQUIERDO AL FRENTE',tech:'Puño medio derecho',stance:'Ap sogi izquierdo'},
+{n:9,dir:-90,side:'right',kind:'inside',travel:'GIRA 180° A LA IZQUIERDA',leadSide:'left',lead:'PIE IZQUIERDO AL FRENTE',tech:'Bloqueo medio interior derecho',stance:'Ap sogi izquierdo'},
+{n:10,dir:-90,side:'left',kind:'punch',travel:'AVANZA',leadSide:'right',lead:'PIE DERECHO AL FRENTE',tech:'Puño medio izquierdo',stance:'Ap sogi derecho'},
+{n:11,dir:0,side:'right',kind:'low',travel:'GIRA 90° A LA DERECHA',leadSide:'right',lead:'PIE DERECHO AL FRENTE',tech:'Bloqueo bajo derecho',stance:'Ap kubi derecho'},
+{n:12,dir:0,side:'left',kind:'punch',travel:'AVANZA',leadSide:'left',lead:'PIE IZQUIERDO AL FRENTE',tech:'Puño medio izquierdo',stance:'Ap kubi izquierdo'},
+{n:13,dir:-90,side:'left',kind:'high',travel:'GIRA 90° A LA IZQUIERDA',leadSide:'left',lead:'PIE IZQUIERDO AL FRENTE',tech:'Bloqueo alto izquierdo',stance:'Ap sogi izquierdo'},
+{n:14,dir:-90,side:'right',kind:'kick',travel:'AVANZA',leadSide:'right',lead:'PIE DERECHO AL FRENTE',tech:'Patada frontal + puño derecho',stance:'Ap sogi derecho'},
+{n:15,dir:90,side:'right',kind:'high',travel:'GIRA 180° A LA DERECHA',leadSide:'right',lead:'PIE DERECHO AL FRENTE',tech:'Bloqueo alto derecho',stance:'Ap sogi derecho'},
+{n:16,dir:90,side:'left',kind:'kick',travel:'AVANZA',leadSide:'left',lead:'PIE IZQUIERDO AL FRENTE',tech:'Patada frontal + puño izquierdo',stance:'Ap sogi izquierdo'},
+{n:17,dir:0,side:'left',kind:'low',travel:'GIRA 90° A LA IZQUIERDA',leadSide:'left',lead:'PIE IZQUIERDO AL FRENTE',tech:'Bloqueo bajo izquierdo',stance:'Ap kubi izquierdo'},
+{n:18,dir:0,side:'right',kind:'punch',travel:'AVANZA',leadSide:'right',lead:'PIE DERECHO AL FRENTE',tech:'Puño medio derecho · KIHAP',stance:'Ap kubi derecho'}
 ];
 function activeMoves(){return cfg.section==='first'?MOVES.slice(0,10):cfg.section==='last'?MOVES.slice(10):MOVES.slice()}
 
@@ -152,7 +152,7 @@ function setCoachBone(name,a,b){const m=coachRig.bones[name],pa=coachPts[a],pb=c
 function mixPoint(out,a,b,t){out.copy(a).lerp(b,t)}
 const coachRest={lh:new THREE.Vector3(-.22,1.02,.03),rh:new THREE.Vector3(.22,1.02,.03),le:new THREE.Vector3(-.31,1.27,.04),re:new THREE.Vector3(.31,1.27,.04)};
 function setCoachPose(m,t){
-  const sx=m?(m.side==='left'?1:-1):0,wide=(m&&m.stance.indexOf('kubi')>-1)?0.28:0.2,front=m&&m.side==='left'?1:-1;
+  const sx=m?(m.side==='left'?1:-1):0,wide=(m&&m.stance.indexOf('kubi')>-1)?0.28:0.2,front=m?(m.leadSide==='left'?-1:1):0;
   cp('hip',0,.88,0);cp('neck',0,1.5,0);cp('leftShoulder',-.25,1.46,0);cp('rightShoulder',.25,1.46,0);cp('leftHip',-.13,.86,0);cp('rightHip',.13,.86,0);
   cp('leftFoot',-.19,.09,front>0?.2:-.16);cp('rightFoot',.19,.09,front<0?.2:-.16);coachPts.leftFoot.x=-wide;coachPts.rightFoot.x=wide;
   cp('leftKnee',-.17,.47,(coachPts.leftFoot.z)*.55);cp('rightKnee',.17,.47,(coachPts.rightFoot.z)*.55);
@@ -176,12 +176,11 @@ function setCoachPose(m,t){
 }
 
 const hudC=document.createElement('canvas');hudC.width=768;hudC.height=460;const hudG=hudC.getContext('2d'),hudTex=canvasTex(hudC),hud=new THREE.Mesh(new THREE.PlaneGeometry(1.65,.99),new THREE.MeshBasicMaterial({map:hudTex,transparent:true,depthTest:false}));hud.visible=false;scene.add(hud);
-function drawHUD(){const g=hudG,m=G.moves[G.idx];g.clearRect(0,0,768,460);g.fillStyle='rgba(6,10,22,.9)';rr(g,4,4,760,452,28);g.fill();g.strokeStyle='#e8b93c';g.lineWidth=4;rr(g,4,4,760,452,28);g.stroke();g.textAlign='center';g.fillStyle='#9aa6c7';g.font='600 28px system-ui,sans-serif';g.fillText('TAEGEUK IL JANG',384,50);if(!m)return;g.fillStyle='#fff';g.font='bold 64px system-ui,sans-serif';g.fillText('MOVIMIENTO '+m.n,384,126);g.fillStyle='#ffd75e';g.font='bold 40px system-ui,sans-serif';wrapText(g,m.tech,384,193,680,46);g.fillStyle='#c9d3ec';g.font='600 31px system-ui,sans-serif';g.fillText(m.stance,384,282);g.fillStyle='#9aa6c7';g.font='600 26px system-ui,sans-serif';const turn=turnLabel(m.dir,G.prevDir);g.fillText(turn,384,327);g.fillStyle='#37e0ff';g.font='bold 27px system-ui,sans-serif';const hint=m.kind==='kick'?'PATADA CONTROLADA · GATILLO AL TERMINAR':cfg.mode==='learn'?'LLEVA LA MANO AL ARO · GATILLO PARA OMITIR':'SIGUE EL PULSO · '+Math.ceil(G.stepLeft)+' s';g.fillText(hint,384,382);g.fillStyle='#9aa6c7';g.font='600 24px system-ui,sans-serif';g.fillText((G.idx+1)+' / '+G.moves.length+'   ·   LIMPIOS '+G.clean,384,426);hudTex.needsUpdate=true}
+function drawHUD(){const g=hudG,m=G.moves[G.idx];g.clearRect(0,0,768,460);g.fillStyle='rgba(6,10,22,.92)';rr(g,4,4,760,452,28);g.fill();g.strokeStyle='#e8b93c';g.lineWidth=4;rr(g,4,4,760,452,28);g.stroke();g.textAlign='center';g.fillStyle='#9aa6c7';g.font='600 28px system-ui,sans-serif';g.fillText('TAEGEUK IL JANG',384,46);if(!m)return;g.fillStyle='#fff';g.font='bold 55px system-ui,sans-serif';g.fillText('MOVIMIENTO '+m.n,384,106);g.fillStyle='#ffd75e';g.font='bold 36px system-ui,sans-serif';g.fillText(m.travel,384,158);g.fillStyle='#fff';g.font='bold 29px system-ui,sans-serif';g.fillText(m.lead,384,201);g.fillStyle='#37e0ff';g.font='bold 34px system-ui,sans-serif';wrapText(g,m.tech,384,252,680,38);g.fillStyle='#c9d3ec';g.font='600 27px system-ui,sans-serif';g.fillText(m.stance,384,321);g.fillStyle='#37e0ff';g.font='bold 25px system-ui,sans-serif';const hint=m.kind==='kick'?'PATADA CONTROLADA · GATILLO AL TERMINAR':cfg.mode==='learn'?'DESPUÉS, LLEVA LA MANO AL ARO':'DESPUÉS, SIGUE EL PULSO · '+Math.ceil(G.stepLeft)+' s';g.fillText(hint,384,373);g.fillStyle='#9aa6c7';g.font='600 23px system-ui,sans-serif';g.fillText((G.idx+1)+' / '+G.moves.length+'   ·   LIMPIOS '+G.clean+'   ·   GATILLO PARA OMITIR',384,422);hudTex.needsUpdate=true}
 function wrapText(g,text,x,y,maxWidth,lineHeight){const words=text.split(' ');let line='';for(let n=0;n<words.length;n++){const test=line+words[n]+' ';if(g.measureText(test).width>maxWidth&&n>0){g.fillText(line,x,y);line=words[n]+' ';y+=lineHeight}else line=test}g.fillText(line,x,y)}
-function turnLabel(dir,prev){let d=((dir-prev+540)%360)-180;if(Math.abs(d)<10)return 'AVANZA EN LA MISMA DIRECCIÓN';if(Math.abs(d)>150)return 'GIRA 180°';return d<0?'GIRA 90° A LA IZQUIERDA':'GIRA 90° A LA DERECHA'}
 
 const bigC=document.createElement('canvas');bigC.width=512;bigC.height=256;const bigG=bigC.getContext('2d'),bigTex=canvasTex(bigC),bigSprite=new THREE.Sprite(new THREE.SpriteMaterial({map:bigTex,transparent:true,depthTest:false}));bigSprite.scale.set(1.5,.75,1);bigSprite.visible=false;scene.add(bigSprite);
-function bigText(txt,css='#fff',hold=1){const g=bigG;g.clearRect(0,0,512,256);g.textAlign='center';g.textBaseline='middle';g.font='bold 112px system-ui,sans-serif';g.lineWidth=10;g.strokeStyle='rgba(0,0,0,.8)';g.strokeText(txt,256,128);g.fillStyle=css;g.fillText(txt,256,128);bigTex.needsUpdate=true;bigSprite.visible=true;G.bigT=hold}
+function bigText(txt,css='#fff',hold=1,sub=''){const g=bigG;g.clearRect(0,0,512,256);g.textAlign='center';g.textBaseline='middle';const size=txt.length>18?52:txt.length>10?67:100;g.font='bold '+size+'px system-ui,sans-serif';g.lineWidth=9;g.strokeStyle='rgba(0,0,0,.84)';const y=sub?94:128;g.strokeText(txt,256,y);g.fillStyle=css;g.fillText(txt,256,y);if(sub){g.font='bold 41px system-ui,sans-serif';g.lineWidth=7;g.strokeText(sub,256,184);g.fillStyle='#fff';g.fillText(sub,256,184)}bigTex.needsUpdate=true;bigSprite.visible=true;G.bigT=hold}
 const resC=document.createElement('canvas');resC.width=640;resC.height=430;const resG=resC.getContext('2d'),resTex=canvasTex(resC),resPanel=new THREE.Mesh(new THREE.PlaneGeometry(1.5,1.01),new THREE.MeshBasicMaterial({map:resTex,transparent:true,depthTest:false}));resPanel.visible=false;scene.add(resPanel);
 function showResultsVR(){const g=resG;g.clearRect(0,0,640,430);g.fillStyle='rgba(6,10,22,.92)';rr(g,4,4,632,422,26);g.fill();g.strokeStyle='#e8b93c';g.lineWidth=4;rr(g,4,4,632,422,26);g.stroke();g.textAlign='center';g.fillStyle='#e8b93c';g.font='bold 40px system-ui,sans-serif';g.fillText('PASADA COMPLETA',320,65);g.fillStyle='#fff';g.font='bold 76px system-ui,sans-serif';g.fillText(G.completed+' / '+G.moves.length,320,160);g.fillStyle='#9aa6c7';g.font='600 27px system-ui,sans-serif';g.fillText('movimientos realizados',320,201);g.fillStyle='#72d6aa';g.font='bold 35px system-ui,sans-serif';g.fillText(G.clean+' alineados con la guía',320,270);g.fillStyle='#c9d3ec';g.font='600 25px system-ui,sans-serif';g.fillText('Repite despacio antes de subir la cadencia',320,328);g.fillStyle='#9aa6c7';g.font='600 22px system-ui,sans-serif';g.fillText('El visor saldrá automáticamente',320,385);resTex.needsUpdate=true;resPanel.visible=true}
 
@@ -193,9 +192,9 @@ function positionCoach(dirDeg,snap){const d=yawDir(dirDeg),dest=_coachAim.copy(G
 function positionCue(){const m=G.moves[G.idx];if(!m)return;viewerPose(_viewPos,_headDir);const d=yawDir(m.dir),right=_right.set(-d.z,0,d.x),h=THREE.MathUtils.clamp(_viewPos.y,1.25,2.05);let x=m.side==='left'?-.28:.28,y=h*.72,z=.62;if(m.kind==='low'){x=m.side==='left'?-.34:.34;y=h*.46;z=.42}else if(m.kind==='high'){x=m.side==='left'?-.25:.25;y=h*.94;z=.34}else if(m.kind==='inside'){x=m.side==='left'?-.16:.16;y=h*.7;z=.45}else if(m.kind==='kick'){x=m.side==='left'?-.2:.2;y=h*.71;z=.66}_target.copy(G.center).addScaledVector(d,z).addScaledVector(right,x);_target.y=y;targetGroup.position.copy(_target);targetGroup.lookAt(_viewPos);targetGroup.visible=true;pathLine.visible=m.kind!=='kick';if(pathLine.visible){const c=ctrl(m.side);c.getWorldPosition(_hand);const a=pathLine.geometry.attributes.position.array;a[0]=_hand.x;a[1]=_hand.y;a[2]=_hand.z;a[3]=_target.x;a[4]=_target.y;a[5]=_target.z;pathLine.geometry.attributes.position.needsUpdate=true}arrow.position.set(G.center.x,.03,G.center.z);arrow.setDirection(d);arrow.visible=true}
 function facingAlignment(m){viewerPose(_viewPos,_headDir);_headDir.y=0;_headDir.normalize();return _headDir.dot(yawDir(m.dir))>.7}
 function currentAlignment(){const m=G.moves[G.idx];if(!m||m.kind==='kick')return false;const c=ctrl(m.side);c.getWorldPosition(_hand);return facingAlignment(m)&&_hand.distanceTo(_target)<.29}
-function showMove(){const m=G.moves[G.idx];if(!m){endGame();return}G.prevDir=G.idx?G.moves[G.idx-1].dir:0;G.stepLeft=cfg.pace;G.demoT=0;positionCoach(m.dir,false);setCoachPose(m,0);positionCue();drawHUD();sfx.step()}
+function showMove(){const m=G.moves[G.idx];if(!m){endGame();return}G.prevDir=G.idx?G.moves[G.idx-1].dir:0;G.stepLeft=cfg.pace;G.demoT=0;positionCoach(m.dir,false);setCoachPose(m,0);positionCue();drawHUD();bigText(m.travel,'#ffd75e',1.15,m.lead);sfx.step()}
 function confirmMove(manual){if(G.state!=='playing')return;const m=G.moves[G.idx];const aligned=m.kind==='kick'?facingAlignment(m):currentAlignment();if(manual)G.manual++;if(aligned)G.clean++;else if(manual)G.skipped++;G.completed++;if(aligned){sfx.good();buzz(m.side);bigText('BIEN','#72d6aa',.45)}G.idx++;if(G.idx>=G.moves.length){endGame();return}showMove()}
-function calibrate(){viewerPose(_viewPos,_headDir);G.center.set(_viewPos.x,0,_viewPos.z);_headDir.y=0;if(_headDir.lengthSq()<1e-4)_headDir.set(0,0,-1);_headDir.normalize();G.baseYaw=Math.atan2(-_headDir.x,-_headDir.z);startRing.position.x=G.center.x;startRing.position.z=G.center.z;positionCoach(0,true);setCoachPose(null,0)}
+function calibrate(){viewerPose(_viewPos,_headDir);G.center.set(_viewPos.x,0,_viewPos.z);_headDir.y=0;if(_headDir.lengthSq()<1e-4)_headDir.set(0,0,-1);_headDir.normalize();G.baseYaw=Math.atan2(-_headDir.x,-_headDir.z);if(cfg.section==='last')G.baseYaw+=Math.PI/2;startRing.position.x=G.center.x;startRing.position.z=G.center.z;positionCoach(cfg.section==='last'?-90:0,true);setCoachPose(null,0)}
 function startGame(){G.moves=activeMoves();G.idx=0;G.clean=0;G.completed=0;G.manual=0;G.skipped=0;G.prevDir=0;G.state='countdown';G.cd=3;G.cdShown=99;G.bigT=0;G.endT=0;hud.visible=true;resPanel.visible=false;targetGroup.visible=false;arrow.visible=false;pathLine.visible=false;coach.visible=false}
 function endGame(){G.state='done';G.endT=8;targetGroup.visible=false;arrow.visible=false;pathLine.visible=false;coach.visible=false;hud.visible=false;bigSprite.visible=false;showResultsVR();sfx.finish()}
 function showResultsHTML(){const pct=G.moves.length?Math.round(100*G.clean/G.moves.length):0;$('resultsBody').innerHTML='<div class="stat"><span>Movimientos realizados</span><b>'+G.completed+' / '+G.moves.length+'</b></div><div class="stat"><span>Alineados con la guía</span><b>'+G.clean+' · '+pct+'%</b></div><div class="stat"><span>Confirmados con gatillo</span><b>'+G.manual+'</b></div><div class="stat"><span>Próximo paso</span><b>Repetir antes de subir la cadencia</b></div>';$('results').style.display='block';setStatus('Pasada terminada. Revisa el resumen y vuelve a entrar cuando quieras.')}
