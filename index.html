@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>Poomsae VR · Prototipo WebXR</title>
+<style>
+:root{--bg:#f0f2f7;--card:#fff;--acc:#b77b00;--txt:#101728;--mut:#4f5d78;--edge:#cfd5e2;--opt:#f5f7fb;--warn:#fff4df;--warn-edge:#c8821a;--rule:#d9deea;--good:#18794e;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#0b1020;--card:#151d33;--acc:#e8b93c;--txt:#eef2ff;--mut:#aeb8d4;--edge:#34405f;--opt:#101731;--warn:#2a1a12;--warn-edge:#8a5a2a;--rule:#303a59;--good:#72d6aa}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;min-height:100vh}
+#app canvas{position:fixed;inset:0;z-index:0;display:block}
+#ui{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:28px 18px 60px}
+body.inxr #ui{display:none}
+h1{font-size:29px;line-height:1.15;margin:6px 0 5px}.sub{color:var(--mut);margin:0 0 18px;line-height:1.5}.kor{font-size:13px;color:var(--mut);letter-spacing:.15em}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:16px;margin:12px 0}.card h2{font-size:14px;margin:0 0 10px;color:var(--acc);text-transform:uppercase;letter-spacing:.06em}
+.opts{display:flex;gap:10px;flex-wrap:wrap}.opt{flex:1 1 145px;border:2px solid var(--edge);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--opt);color:var(--txt);text-align:left;font:inherit}.opt.sel{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,var(--card))}.opt:focus-visible{outline:3px solid color-mix(in srgb,var(--acc) 45%,transparent);outline-offset:2px}.opt b{display:block;font-size:15px;margin-bottom:2px}.opt span{font-size:12.5px;color:var(--mut);line-height:1.4;display:block}
+.session-line{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.session-line strong{font-size:17px}.session-line span{color:var(--mut);font-size:13px}.move-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.move-tags span{font-size:12px;padding:5px 8px;border-radius:6px;background:var(--opt);border:1px solid var(--edge);color:var(--mut)}
+.warn{background:var(--warn);border:1px solid var(--warn-edge);border-radius:14px;padding:14px 16px;margin:14px 0;font-size:14px;line-height:1.55}.warn b{color:var(--acc)}
+ol.steps{margin:8px 0;padding-left:22px;font-size:14.5px;line-height:1.7}
+#enterVR{display:block;width:100%;margin:18px 0 8px;padding:16px;font-size:18px;font-weight:750;border:0;border-radius:12px;background:var(--acc);color:#171105;cursor:pointer}#enterVR:disabled{background:#3a4566;color:#d3d8e6;cursor:default}#xrStatus{text-align:center;color:var(--mut);font-size:13.5px;line-height:1.45;min-height:38px;margin-bottom:8px}
+#results{display:none}.stat{display:flex;justify-content:space-between;gap:16px;padding:8px 2px;border-bottom:1px solid var(--rule);font-size:15px}.stat:last-child{border:0}.stat b{color:var(--acc);text-align:right}.foot{color:var(--mut);font-size:12.5px;text-align:center;line-height:1.55;margin-top:20px}.foot a{color:var(--mut);text-underline-offset:2px}
+@media(max-width:480px){#ui{padding:20px 14px 44px}h1{font-size:26px}.card{padding:14px}.opt{flex-basis:130px}.session-line{display:block}.session-line span{display:block;margin-top:3px}}
+</style>
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<main id="ui">
+  <div class="kor">태권도 · POOMSAE GUIADO</div>
+  <h1>Practica formas en realidad virtual</h1>
+  <p class="sub">Sigue los 18 movimientos de <b>Taegeuk Il Jang</b> con dirección, técnica y cadencia visibles dentro del visor. Los controles se usan en las manos; el prototipo guía el recorrido y aproxima la posición de brazos y orientación.</p>
+
+  <section class="card"><h2>Tipo de práctica</h2><div class="opts" id="modeOpts">
+    <button class="opt sel" type="button" data-v="learn"><b>Aprender</b><span>Espera hasta alcanzar la guía de mano. El gatillo confirma patadas o permite continuar.</span></button>
+    <button class="opt" type="button" data-v="flow"><b>Pasada con cadencia</b><span>Avanza automáticamente al pulso elegido, como una pasada completa.</span></button>
+  </div></section>
+
+  <section class="card"><h2>Tramo</h2><div class="opts" id="sectionOpts">
+    <button class="opt sel" type="button" data-v="full"><b>Forma completa</b><span>Movimientos 1–18, con kihap final.</span></button>
+    <button class="opt" type="button" data-v="first"><b>Primera mitad</b><span>Movimientos 1–10 para memorizar el inicio.</span></button>
+    <button class="opt" type="button" data-v="last"><b>Segunda mitad</b><span>Movimientos 11–18, bloqueos altos y patadas.</span></button>
+  </div></section>
+
+  <section class="card"><h2>Cadencia</h2><div class="opts" id="paceOpts">
+    <button class="opt" type="button" data-v="4"><b>Didáctica · 4 s</b></button>
+    <button class="opt sel" type="button" data-v="3"><b>Controlada · 3 s</b></button>
+    <button class="opt" type="button" data-v="2.2"><b>Continua · 2.2 s</b></button>
+  </div></section>
+
+  <section class="card"><h2>Sesión preparada</h2><div class="session-line"><div><strong>Taegeuk Il Jang</strong><span>18 movimientos · nivel inicial</span></div><span id="sessionSummary">Forma completa · 3 s por movimiento</span></div><div class="move-tags"><span>Ap sogi</span><span>Ap kubi</span><span>Arae makki</span><span>Momtong jireugi</span><span>Momtong an makki</span><span>Olgul makki</span><span>Ap chagi</span></div></section>
+
+  <div class="warn"><b>Seguridad primero:</b> despeja un área de al menos 2 × 2 m, activa el límite de seguridad y usa las correas de muñeca. Practica sin golpear objetos; el visor no puede comprobar la colocación exacta de los pies.</div>
+
+  <section class="card"><h2>Cómo se practica en VR</h2><ol class="steps"><li>Mira la <b>flecha del suelo</b> para girar y avanzar en la dirección correcta.</li><li>Replica la guardia y lleva la mano indicada al <b>aro luminoso</b>.</li><li>En las patadas, ejecuta el movimiento con control y pulsa el <b>gatillo</b> al terminar.</li><li>El panel muestra conteo, técnica, postura y el siguiente paso.</li></ol></section>
+
+  <button id="enterVR" disabled>Comprobando WebXR…</button><div id="xrStatus" role="status" aria-live="polite"></div>
+  <section class="card" id="results"><h2>Última pasada</h2><div id="resultsBody"></div></section>
+  <div class="foot">Prototipo WebXR · La guía de posición es aproximada y complementa, no sustituye, la corrección de un instructor.<br><a href="http://lehightaekwondo.com/poomse/taegeuk_il_jang/index.shtml" target="_blank" rel="noopener">Referencia de la secuencia Taegeuk Il Jang</a></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const cfg={mode:'learn',section:'full',pace:3};
+function bindOpts(id,key,parse){const el=$(id);el.querySelectorAll('.opt').forEach(o=>o.addEventListener('click',()=>{el.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');cfg[key]=parse?parse(o.dataset.v):o.dataset.v;updateSummary()}))}
+bindOpts('modeOpts','mode');bindOpts('sectionOpts','section');bindOpts('paceOpts','pace',Number);
+function updateSummary(){const s=cfg.section==='full'?'Forma completa':cfg.section==='first'?'Movimientos 1–10':'Movimientos 11–18';$('sessionSummary').textContent=s+' · '+cfg.pace+' s por movimiento'}
+function setStatus(t){$('xrStatus').textContent=t}
+let AC=null;
+function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,dur=.12,type='sine',vol=.12,delay=0){const a=ac();if(!a)return;const t=a.currentTime+delay,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+dur+.05)}
+const sfx={step(){tone(520,.08,'sine',.1)},good(){tone(620,.1,'sine',.12);tone(830,.16,'sine',.1,.09)},count(){tone(390,.08,'square',.06)},finish(){tone(523,.12,'sine',.13);tone(659,.12,'sine',.13,.13);tone(784,.28,'sine',.14,.26)}};
+
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x0b1020);scene.fog=new THREE.Fog(0x0b1020,9,24);
+const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.05,60);camera.position.set(0,1.6,3.4);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.xr.enabled=true;renderer.xr.setReferenceSpaceType('local-floor');$('app').appendChild(renderer.domElement);
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+scene.add(new THREE.HemisphereLight(0xcfe0ff,0x3a2c1c,.85));const keyL=new THREE.DirectionalLight(0xffffff,1.1);keyL.position.set(4,7,3);scene.add(keyL);const fillL=new THREE.PointLight(0x88aaff,25,16);fillL.position.set(-3,3.4,-2);scene.add(fillL);
+function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+function canvasTex(c){const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t}
+function woodTexture(){const c=document.createElement('canvas');c.width=c.height=512;const g=c.getContext('2d');g.fillStyle='#9a6b3f';g.fillRect(0,0,512,512);for(let i=0;i<8;i++){const y=i*64;g.fillStyle='hsl('+(28+Math.random()*8)+','+(38+Math.random()*10)+'%,'+(38+Math.random()*8)+'%)';g.fillRect(0,y,512,62);g.fillStyle='rgba(0,0,0,.35)';g.fillRect(0,y+62,512,2);g.strokeStyle='rgba(60,35,15,.25)';for(let k=0;k<6;k++){g.beginPath();const gy=y+8+Math.random()*48;g.moveTo(0,gy);g.bezierCurveTo(150,gy+6,350,gy-6,512,gy);g.stroke()}}const t=canvasTex(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(3,3);return t}
+function matTexture(){const c=document.createElement('canvas');c.width=c.height=512;const g=c.getContext('2d');g.fillStyle='#1d2a52';g.fillRect(0,0,512,512);g.strokeStyle='rgba(255,255,255,.85)';g.lineWidth=14;g.strokeRect(24,24,464,464);g.beginPath();g.arc(256,256,110,0,Math.PI*2);g.stroke();g.fillStyle='rgba(255,255,255,.75)';g.font='bold 44px system-ui,sans-serif';g.textAlign='center';g.fillText('태권도',256,272);return canvasTex(c)}
+function bannerTexture(){const c=document.createElement('canvas');c.width=1024;c.height=256;const g=c.getContext('2d');g.fillStyle='#741c1c';g.fillRect(0,0,1024,256);g.strokeStyle='#e8b93c';g.lineWidth=10;g.strokeRect(14,14,996,228);g.textAlign='center';g.fillStyle='#f5d97a';g.font='bold 120px system-ui,sans-serif';g.fillText('태권도',512,138);g.font='600 44px system-ui,sans-serif';g.fillStyle='#ffe9b0';g.fillText('P O O M S A E',512,208);return canvasTex(c)}
+{
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(12,12),new THREE.MeshStandardMaterial({map:woodTexture(),roughness:.8}));floor.rotation.x=-Math.PI/2;scene.add(floor);
+const mat=new THREE.Mesh(new THREE.PlaneGeometry(3.4,3.4),new THREE.MeshStandardMaterial({map:matTexture(),roughness:.9}));mat.rotation.x=-Math.PI/2;mat.position.y=.005;scene.add(mat);
+const wallMat=new THREE.MeshStandardMaterial({color:0x182036,roughness:.95});const mkWall=(w,h,x,y,z,ry)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),wallMat);m.position.set(x,y,z);m.rotation.y=ry;scene.add(m)};mkWall(12,4,0,2,-6,0);mkWall(12,4,0,2,6,Math.PI);mkWall(12,4,-6,2,0,Math.PI/2);mkWall(12,4,6,2,0,-Math.PI/2);
+const ceil=new THREE.Mesh(new THREE.PlaneGeometry(12,12),new THREE.MeshStandardMaterial({color:0x0d1226,roughness:1}));ceil.rotation.x=Math.PI/2;ceil.position.y=4;scene.add(ceil);
+const panelMat=new THREE.MeshBasicMaterial({color:0xf4f7ff});[[-2.5,-2.5],[2.5,-2.5],[-2.5,2.5],[2.5,2.5]].forEach(([x,z])=>{const p=new THREE.Mesh(new THREE.PlaneGeometry(1.6,.8),panelMat);p.rotation.x=Math.PI/2;p.position.set(x,3.97,z);scene.add(p)});
+const banner=new THREE.Mesh(new THREE.PlaneGeometry(4.6,1.15),new THREE.MeshBasicMaterial({map:bannerTexture()}));banner.position.set(0,2.6,-5.93);scene.add(banner)
+}
+
+const MOVES=[
+{n:1,dir:-90,side:'left',kind:'low',tech:'Bloqueo bajo izquierdo',stance:'Ap sogi izquierdo'},
+{n:2,dir:-90,side:'right',kind:'punch',tech:'Puño medio derecho',stance:'Ap sogi derecho'},
+{n:3,dir:90,side:'right',kind:'low',tech:'Bloqueo bajo derecho',stance:'Ap sogi derecho'},
+{n:4,dir:90,side:'left',kind:'punch',tech:'Puño medio izquierdo',stance:'Ap sogi izquierdo'},
+{n:5,dir:0,side:'left',kind:'low',tech:'Bloqueo bajo izquierdo',stance:'Ap kubi izquierdo'},
+{n:6,dir:0,side:'right',kind:'punch',tech:'Puño medio derecho',stance:'Mantén ap kubi'},
+{n:7,dir:90,side:'left',kind:'inside',tech:'Bloqueo medio interior izquierdo',stance:'Ap sogi derecho'},
+{n:8,dir:90,side:'right',kind:'punch',tech:'Puño medio derecho',stance:'Ap sogi izquierdo'},
+{n:9,dir:-90,side:'right',kind:'inside',tech:'Bloqueo medio interior derecho',stance:'Ap sogi izquierdo'},
+{n:10,dir:-90,side:'left',kind:'punch',tech:'Puño medio izquierdo',stance:'Ap sogi derecho'},
+{n:11,dir:0,side:'right',kind:'low',tech:'Bloqueo bajo derecho',stance:'Ap kubi derecho'},
+{n:12,dir:0,side:'left',kind:'punch',tech:'Puño medio izquierdo',stance:'Mantén ap kubi'},
+{n:13,dir:-90,side:'left',kind:'high',tech:'Bloqueo alto izquierdo',stance:'Ap sogi izquierdo'},
+{n:14,dir:-90,side:'right',kind:'kick',tech:'Patada frontal + puño derecho',stance:'Ap sogi derecho'},
+{n:15,dir:90,side:'right',kind:'high',tech:'Bloqueo alto derecho',stance:'Ap sogi derecho'},
+{n:16,dir:90,side:'left',kind:'kick',tech:'Patada frontal + puño izquierdo',stance:'Ap sogi izquierdo'},
+{n:17,dir:180,side:'left',kind:'low',tech:'Bloqueo bajo izquierdo',stance:'Ap kubi izquierdo'},
+{n:18,dir:180,side:'right',kind:'punch',tech:'Puño medio derecho · KIHAP',stance:'Ap kubi derecho'}
+];
+function activeMoves(){return cfg.section==='first'?MOVES.slice(0,10):cfg.section==='last'?MOVES.slice(10):MOVES.slice()}
+
+const controllers=[];
+for(let i=0;i<2;i++){
+  const c=renderer.xr.getController(i);
+  c.addEventListener('connected',e=>{c.userData.handedness=e.data.handedness;c.userData.src=e.data});
+  c.addEventListener('disconnected',()=>{c.userData.handedness=null;c.userData.src=null});
+  c.addEventListener('selectstart',()=>{if(G.state==='playing')confirmMove(true)});
+  const hand=new THREE.Mesh(new THREE.SphereGeometry(.045,16,16),new THREE.MeshBasicMaterial({color:i?0xff5a5f:0x37e0ff}));c.add(hand);scene.add(c);controllers.push(c)
+}
+function ctrl(side){return controllers.find(c=>c.userData.handedness===side)||controllers[side==='left'?0:1]}
+function buzz(side){try{const s=ctrl(side).userData.src,h=s&&s.gamepad&&s.gamepad.hapticActuators&&s.gamepad.hapticActuators[0];if(h)h.pulse(.55,90)}catch(e){}}
+
+const targetGroup=new THREE.Group();scene.add(targetGroup);
+const targetCore=new THREE.Mesh(new THREE.SphereGeometry(.085,24,16),new THREE.MeshBasicMaterial({color:0xffd75e,transparent:true,opacity:.78}));
+const targetRing=new THREE.Mesh(new THREE.TorusGeometry(.19,.018,12,48),new THREE.MeshBasicMaterial({color:0xffd75e,transparent:true,opacity:.95,depthTest:false}));
+targetGroup.add(targetCore,targetRing);targetGroup.visible=false;
+const pathGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3(0,0,.5)]);const pathLine=new THREE.Line(pathGeo,new THREE.LineBasicMaterial({color:0x37e0ff,transparent:true,opacity:.8}));scene.add(pathLine);pathLine.visible=false;
+const arrow=new THREE.ArrowHelper(new THREE.Vector3(0,0,-1),new THREE.Vector3(0,.025,0),1.15,0xe8b93c,.3,.17);scene.add(arrow);arrow.visible=false;
+const startRing=new THREE.Mesh(new THREE.RingGeometry(.42,.47,48),new THREE.MeshBasicMaterial({color:0xe8b93c,side:THREE.DoubleSide,transparent:true,opacity:.8}));startRing.rotation.x=-Math.PI/2;startRing.position.y=.012;scene.add(startRing);
+
+const hudC=document.createElement('canvas');hudC.width=768;hudC.height=460;const hudG=hudC.getContext('2d'),hudTex=canvasTex(hudC),hud=new THREE.Mesh(new THREE.PlaneGeometry(1.65,.99),new THREE.MeshBasicMaterial({map:hudTex,transparent:true,depthTest:false}));hud.visible=false;scene.add(hud);
+function drawHUD(){const g=hudG,m=G.moves[G.idx];g.clearRect(0,0,768,460);g.fillStyle='rgba(6,10,22,.9)';rr(g,4,4,760,452,28);g.fill();g.strokeStyle='#e8b93c';g.lineWidth=4;rr(g,4,4,760,452,28);g.stroke();g.textAlign='center';g.fillStyle='#9aa6c7';g.font='600 28px system-ui,sans-serif';g.fillText('TAEGEUK IL JANG',384,50);if(!m)return;g.fillStyle='#fff';g.font='bold 64px system-ui,sans-serif';g.fillText('MOVIMIENTO '+m.n,384,126);g.fillStyle='#ffd75e';g.font='bold 40px system-ui,sans-serif';wrapText(g,m.tech,384,193,680,46);g.fillStyle='#c9d3ec';g.font='600 31px system-ui,sans-serif';g.fillText(m.stance,384,282);g.fillStyle='#9aa6c7';g.font='600 26px system-ui,sans-serif';const turn=turnLabel(m.dir,G.prevDir);g.fillText(turn,384,327);g.fillStyle='#37e0ff';g.font='bold 27px system-ui,sans-serif';const hint=m.kind==='kick'?'PATADA CONTROLADA · GATILLO AL TERMINAR':cfg.mode==='learn'?'LLEVA LA MANO AL ARO · GATILLO PARA OMITIR':'SIGUE EL PULSO · '+Math.ceil(G.stepLeft)+' s';g.fillText(hint,384,382);g.fillStyle='#9aa6c7';g.font='600 24px system-ui,sans-serif';g.fillText((G.idx+1)+' / '+G.moves.length+'   ·   LIMPIOS '+G.clean,384,426);hudTex.needsUpdate=true}
+function wrapText(g,text,x,y,maxWidth,lineHeight){const words=text.split(' ');let line='';for(let n=0;n<words.length;n++){const test=line+words[n]+' ';if(g.measureText(test).width>maxWidth&&n>0){g.fillText(line,x,y);line=words[n]+' ';y+=lineHeight}else line=test}g.fillText(line,x,y)}
+function turnLabel(dir,prev){let d=((dir-prev+540)%360)-180;if(Math.abs(d)<10)return 'AVANZA EN LA MISMA DIRECCIÓN';if(Math.abs(d)>150)return 'GIRA 180°';return d<0?'GIRA 90° A LA IZQUIERDA':'GIRA 90° A LA DERECHA'}
+
+const bigC=document.createElement('canvas');bigC.width=512;bigC.height=256;const bigG=bigC.getContext('2d'),bigTex=canvasTex(bigC),bigSprite=new THREE.Sprite(new THREE.SpriteMaterial({map:bigTex,transparent:true,depthTest:false}));bigSprite.scale.set(1.5,.75,1);bigSprite.visible=false;scene.add(bigSprite);
+function bigText(txt,css='#fff',hold=1){const g=bigG;g.clearRect(0,0,512,256);g.textAlign='center';g.textBaseline='middle';g.font='bold 112px system-ui,sans-serif';g.lineWidth=10;g.strokeStyle='rgba(0,0,0,.8)';g.strokeText(txt,256,128);g.fillStyle=css;g.fillText(txt,256,128);bigTex.needsUpdate=true;bigSprite.visible=true;G.bigT=hold}
+const resC=document.createElement('canvas');resC.width=640;resC.height=430;const resG=resC.getContext('2d'),resTex=canvasTex(resC),resPanel=new THREE.Mesh(new THREE.PlaneGeometry(1.5,1.01),new THREE.MeshBasicMaterial({map:resTex,transparent:true,depthTest:false}));resPanel.visible=false;scene.add(resPanel);
+function showResultsVR(){const g=resG;g.clearRect(0,0,640,430);g.fillStyle='rgba(6,10,22,.92)';rr(g,4,4,632,422,26);g.fill();g.strokeStyle='#e8b93c';g.lineWidth=4;rr(g,4,4,632,422,26);g.stroke();g.textAlign='center';g.fillStyle='#e8b93c';g.font='bold 40px system-ui,sans-serif';g.fillText('PASADA COMPLETA',320,65);g.fillStyle='#fff';g.font='bold 76px system-ui,sans-serif';g.fillText(G.completed+' / '+G.moves.length,320,160);g.fillStyle='#9aa6c7';g.font='600 27px system-ui,sans-serif';g.fillText('movimientos realizados',320,201);g.fillStyle='#72d6aa';g.font='bold 35px system-ui,sans-serif';g.fillText(G.clean+' alineados con la guía',320,270);g.fillStyle='#c9d3ec';g.font='600 25px system-ui,sans-serif';g.fillText('Repite despacio antes de subir la cadencia',320,328);g.fillStyle='#9aa6c7';g.font='600 22px system-ui,sans-serif';g.fillText('El visor saldrá automáticamente',320,385);resTex.needsUpdate=true;resPanel.visible=true}
+
+const G={state:'idle',moves:[],idx:0,center:new THREE.Vector3(),baseYaw:0,prevDir:0,stepLeft:0,clean:0,completed:0,manual:0,skipped:0,cd:0,cdShown:99,bigT:0,endT:0};
+const _dir=new THREE.Vector3(),_target=new THREE.Vector3(),_hand=new THREE.Vector3(),_headDir=new THREE.Vector3();
+function yawDir(deg){const r=(G.baseYaw-deg*Math.PI/180);return new THREE.Vector3(-Math.sin(r),0,-Math.cos(r))}
+function positionCue(){const m=G.moves[G.idx];if(!m)return;const d=yawDir(m.dir),right=new THREE.Vector3(-d.z,0,d.x),h=THREE.MathUtils.clamp(camera.position.y,1.25,2.05);let x=m.side==='left'?-.28:.28,y=h*.72,z=.62;if(m.kind==='low'){x=m.side==='left'?-.34:.34;y=h*.46;z=.42}else if(m.kind==='high'){x=m.side==='left'?-.25:.25;y=h*.94;z=.34}else if(m.kind==='inside'){x=m.side==='left'?-.16:.16;y=h*.7;z=.45}else if(m.kind==='kick'){x=m.side==='left'?-.2:.2;y=h*.71;z=.66}_target.copy(G.center).addScaledVector(d,z).addScaledVector(right,x);_target.y=y;targetGroup.position.copy(_target);targetGroup.lookAt(camera.position);targetGroup.visible=true;pathLine.visible=m.kind!=='kick';if(pathLine.visible){const c=ctrl(m.side);c.getWorldPosition(_hand);const a=pathLine.geometry.attributes.position.array;a[0]=_hand.x;a[1]=_hand.y;a[2]=_hand.z;a[3]=_target.x;a[4]=_target.y;a[5]=_target.z;pathLine.geometry.attributes.position.needsUpdate=true}arrow.position.set(G.center.x,.03,G.center.z);arrow.setDirection(d);arrow.visible=true}
+function facingAlignment(m){camera.getWorldDirection(_headDir);_headDir.y=0;_headDir.normalize();return _headDir.dot(yawDir(m.dir))>.7}
+function currentAlignment(){const m=G.moves[G.idx];if(!m||m.kind==='kick')return false;const c=ctrl(m.side);c.getWorldPosition(_hand);return facingAlignment(m)&&_hand.distanceTo(_target)<.29}
+function showMove(){const m=G.moves[G.idx];if(!m){endGame();return}G.prevDir=G.idx?G.moves[G.idx-1].dir:0;G.stepLeft=cfg.pace;positionCue();drawHUD();sfx.step()}
+function confirmMove(manual){if(G.state!=='playing')return;const m=G.moves[G.idx];const aligned=m.kind==='kick'?facingAlignment(m):currentAlignment();if(manual)G.manual++;if(aligned)G.clean++;else if(manual)G.skipped++;G.completed++;if(aligned){sfx.good();buzz(m.side);bigText('BIEN','#72d6aa',.45)}G.idx++;if(G.idx>=G.moves.length){endGame();return}showMove()}
+function calibrate(){G.center.set(camera.position.x,0,camera.position.z);camera.getWorldDirection(_headDir);G.baseYaw=Math.atan2(-_headDir.x,-_headDir.z);startRing.position.x=G.center.x;startRing.position.z=G.center.z}
+function startGame(){G.moves=activeMoves();G.idx=0;G.clean=0;G.completed=0;G.manual=0;G.skipped=0;G.prevDir=0;G.state='countdown';G.cd=3;G.cdShown=99;G.bigT=0;G.endT=0;hud.visible=true;resPanel.visible=false;targetGroup.visible=false;arrow.visible=false;pathLine.visible=false}
+function endGame(){G.state='done';G.endT=8;targetGroup.visible=false;arrow.visible=false;pathLine.visible=false;hud.visible=false;bigSprite.visible=false;showResultsVR();sfx.finish()}
+function showResultsHTML(){const pct=G.moves.length?Math.round(100*G.clean/G.moves.length):0;$('resultsBody').innerHTML='<div class="stat"><span>Movimientos realizados</span><b>'+G.completed+' / '+G.moves.length+'</b></div><div class="stat"><span>Alineados con la guía</span><b>'+G.clean+' · '+pct+'%</b></div><div class="stat"><span>Confirmados con gatillo</span><b>'+G.manual+'</b></div><div class="stat"><span>Próximo paso</span><b>Repetir antes de subir la cadencia</b></div>';$('results').style.display='block';setStatus('Pasada terminada. Revisa el resumen y vuelve a entrar cuando quieras.')}
+function facePanel(mesh,dist,h){camera.getWorldDirection(_dir);_dir.y=0;if(_dir.lengthSq()<1e-4)_dir.set(0,0,-1);_dir.normalize();mesh.position.copy(camera.position).addScaledVector(_dir,dist);mesh.position.y=h;mesh.lookAt(camera.position.x,h,camera.position.z)}
+
+let xrSession=null;
+async function enterVR(){
+  ac();
+  if(!navigator.xr){setStatus('WebXR no está disponible en este navegador.');return}
+  const btn=$('enterVR');
+  btn.disabled=true;btn.textContent='Entrando a VR…';
+  try{
+    xrSession=await navigator.xr.requestSession('immersive-vr',{requiredFeatures:['local-floor'],optionalFeatures:['bounded-floor']});
+    document.body.classList.add('inxr');
+    await renderer.xr.setSession(xrSession);
+  }catch(e){
+    xrSession=null;btn.disabled=false;btn.textContent='Entrar a práctica VR';
+    const policy=document.permissionsPolicy||document.featurePolicy;
+    const blocked=policy&&policy.allowsFeature&&!policy.allowsFeature('xr-spatial-tracking');
+    if(blocked||e&&e.name==='SecurityError')setStatus('El visor sí tiene WebXR, pero esta página no recibió permiso para usarlo. Vuelve a abrir el enlace directamente en el navegador de Meta Quest, no dentro de otra app.');
+    else if(e&&e.name==='NotAllowedError')setStatus('Meta Quest bloqueó el inicio de VR. Toca el botón otra vez y acepta el permiso del visor.');
+    else setStatus('No se pudo iniciar la sesión VR ('+(e&&e.name?e.name:'error')+'). Recarga la página y vuelve a intentarlo.');
+    return
+  }
+  xrSession.addEventListener('end',()=>{document.body.classList.remove('inxr');G.state='idle';hud.visible=false;bigSprite.visible=false;resPanel.visible=false;targetGroup.visible=false;arrow.visible=false;pathLine.visible=false;showResultsHTML();xrSession=null;btn.disabled=false;btn.textContent='Entrar a práctica VR'});
+  startGame();setStatus('')
+}
+const clock=new THREE.Clock();let orbitT=0,pulseT=0;
+renderer.setAnimationLoop(()=>{const dt=Math.min(.05,clock.getDelta()),presenting=renderer.xr.isPresenting;pulseT+=dt;targetRing.scale.setScalar(1+.08*Math.sin(pulseT*5));targetCore.material.opacity=.62+.18*Math.sin(pulseT*5);if(!presenting){orbitT+=dt*.12;camera.position.set(Math.sin(orbitT)*3.4,1.7,Math.cos(orbitT)*3.4);camera.lookAt(0,1.1,0)}else if(G.state==='countdown'){if(G.cd===3)calibrate();G.cd-=dt;const n=Math.ceil(G.cd);if(n!==G.cdShown&&n>=0){G.cdShown=n;if(n>0){bigText(String(n));sfx.count()}else bigText('JOONBI','#ffd75e',.9)}if(G.cd<=0){G.state='playing';showMove()}}else if(G.state==='playing'){positionCue();G.stepLeft-=dt;if(cfg.mode==='learn'){if(G.moves[G.idx].kind!=='kick'&&currentAlignment()&&G.stepLeft<cfg.pace-.55)confirmMove(false)}else if(G.stepLeft<=0)confirmMove(false);if(hud.visible)drawHUD()}else if(G.state==='done'){G.endT-=dt;facePanel(resPanel,1.85,1.55);if(G.endT<=0&&xrSession)xrSession.end()}if(presenting&&hud.visible)facePanel(hud,1.9,1.62);if(presenting&&bigSprite.visible)facePanel(bigSprite,2.05,1.65);if(G.bigT>0){G.bigT-=dt;if(G.bigT<=0)bigSprite.visible=false}renderer.render(scene,camera)});
+$('enterVR').addEventListener('click',enterVR);
+(async()=>{
+  const btn=$('enterVR');
+  if(!navigator.xr){btn.disabled=true;btn.textContent='Abrir en Meta Quest para entrar a VR';setStatus('Este navegador no ofrece la API de WebXR. Abre esta página directamente en el navegador de Meta Quest.');return}
+  btn.disabled=false;btn.textContent='Entrar a práctica VR';
+  let supported=null;
+  try{supported=await navigator.xr.isSessionSupported('immersive-vr')}catch(e){supported=null}
+  if(supported===true)setStatus('Listo para Meta Quest. Sostén ambos controles en las manos y entra al centro del área.');
+  else setStatus('WebXR detectado. Pulsa el botón para solicitar la sesión VR directamente al visor.');
+})();
+</script>
+</body>
+</html>
